@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Court Cleaning ROI Calculator | Autopilot Pickleball</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--navy:#0a0a1e;--navy-mid:#12122e;--navy-light:#1a1a3e;
+--accent:#3b82f6;--accent-glow:rgba(59,130,246,.15);
+--green:#10b981;--green-bg:rgba(16,185,129,.08);--green-border:rgba(16,185,129,.25);
+--yellow:#f59e0b;--yellow-bg:rgba(245,158,11,.08);--yellow-border:rgba(245,158,11,.25);
+--surface:#ffffff;--surface-off:#f8f9fc;
+--text-primary:#0a0a1e;--text-secondary:#5a5a7a;--text-muted:#8a8aa0;
+--border:#e2e4ea;--border-light:#f0f1f5;
+--radius:14px;--radius-sm:10px;
+--shadow-md:0 4px 16px rgba(10,10,30,.06),0 2px 4px rgba(10,10,30,.04);
+--shadow-lg:0 12px 40px rgba(10,10,30,.1),0 4px 12px rgba(10,10,30,.05);
+--font-display:'Instrument Serif',Georgia,serif;
+--font-body:'DM Sans',system-ui,sans-serif;
+}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-body);color:var(--text-primary);background:var(--navy);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(59,130,246,.06),transparent),radial-gradient(ellipse 60% 50% at 80% 90%,rgba(59,130,246,.04),transparent),var(--navy)}
+body::after{content:'';position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:min(700px,90vw);height:min(400px,50vh);z-index:0;pointer-events:none;border:1px solid rgba(59,130,246,.06);border-radius:4px;opacity:.5}
+.wrapper{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 20px 60px}
+.top-bar{width:100%;max-width:560px;display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;animation:fadeDown .6s ease both}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#818cf8);display:grid;place-items:center;font-weight:700;font-size:15px;color:#fff;letter-spacing:-.5px}
+.brand-text{font-size:14px;font-weight:500;color:rgba(255,255,255,.5);letter-spacing:.5px;text-transform:uppercase}
+.btn-top-demo{padding:10px 20px;background:linear-gradient(135deg,var(--accent),#4f7df5);color:#fff;border:none;border-radius:8px;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap}
+.btn-top-demo:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(59,130,246,.35)}
+.card{width:100%;max-width:560px;background:var(--surface);border-radius:20px;box-shadow:var(--shadow-lg),0 0 0 1px rgba(255,255,255,.08);overflow:hidden;animation:scaleIn .5s cubic-bezier(.16,1,.3,1) both;animation-delay:.15s}
+.progress-wrap{height:3px;background:var(--border-light);position:relative;overflow:hidden}
+.progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),#818cf8);transition:width .5s cubic-bezier(.4,0,.2,1);border-radius:0 3px 3px 0}
+.steps{position:relative;overflow:hidden}
+.step{padding:44px 40px 40px;display:none;animation:fadeUp .4s ease both}
+.step.active{display:block}
+.step-tag{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:var(--accent);margin-bottom:20px}
+.step-tag::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s ease infinite}
+.step-title{font-family:var(--font-display);font-size:clamp(26px,4.5vw,34px);line-height:1.15;color:var(--text-primary);margin-bottom:12px;letter-spacing:-.3px}
+.step-title em{font-style:italic;color:var(--accent)}
+.step-sub{font-size:15px;color:var(--text-secondary);line-height:1.55;margin-bottom:32px}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px}
+.field input{width:100%;padding:13px 16px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:15px;color:var(--text-primary);background:var(--surface-off);transition:border-color .2s,box-shadow .2s;outline:none}
+.field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.field input::placeholder{color:var(--text-muted)}
+.btn-primary{width:100%;padding:15px 24px;background:var(--navy);color:#fff;border:none;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px}
+.btn-primary:hover{background:var(--navy-light);transform:translateY(-1px);box-shadow:var(--shadow-md)}
+.btn-primary:active{transform:translateY(0)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-primary .arrow{transition:transform .2s}
+.btn-primary:hover .arrow{transform:translateX(3px)}
+.btn-back{background:none;border:none;font-family:var(--font-body);font-size:13.5px;font-weight:500;color:var(--text-muted);cursor:pointer;padding:8px 0;transition:color .2s}
+.btn-back:hover{color:var(--text-primary)}
+.nav-row{display:flex;align-items:center;justify-content:space-between;margin-top:24px}
+.trust-line{text-align:center;font-size:12.5px;color:var(--text-muted);margin-top:16px;display:flex;align-items:center;justify-content:center;gap:6px}
+.trust-line svg{opacity:.4}
+.q-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px}
+.q-title{font-family:var(--font-display);font-size:22px;line-height:1.3;color:var(--text-primary);margin-bottom:24px;letter-spacing:-.2px}
+.options{display:grid;gap:10px}
+.options.cols-2{grid-template-columns:1fr 1fr}
+.options.cols-4{grid-template-columns:1fr 1fr}
+.options.cols-5{grid-template-columns:1fr 1fr 1fr}
+.opt-btn{padding:16px 18px;background:var(--surface-off);border:1.5px solid var(--border-light);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:14.5px;font-weight:500;color:var(--text-primary);cursor:pointer;text-align:center;transition:all .18s ease}
+.opt-btn:hover{border-color:var(--accent);background:#f0f4ff}
+.opt-btn.selected{border-color:var(--accent);background:linear-gradient(135deg,rgba(59,130,246,.06),rgba(129,140,248,.04));box-shadow:0 0 0 2px var(--accent-glow);color:var(--accent);font-weight:600}
+.opt-btn .opt-label{font-size:15px;font-weight:600;display:block}
+.opt-btn .opt-desc{font-size:12px;color:var(--text-muted);margin-top:3px;display:block;font-weight:400}
+.slider-wrap{margin:20px 0 8px}
+.slider-value{font-family:var(--font-display);font-size:52px;color:var(--text-primary);text-align:center;line-height:1;margin-bottom:20px;letter-spacing:-1px}
+.slider-unit{font-size:24px;color:var(--text-muted);font-family:var(--font-body)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;background:linear-gradient(90deg,var(--accent) var(--fill,0%),var(--border-light) var(--fill,0%));border-radius:3px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--surface);border:2.5px solid var(--accent);box-shadow:0 2px 8px rgba(59,130,246,.25);transition:transform .15s,box-shadow .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.15);box-shadow:0 2px 12px rgba(59,130,246,.35)}
+.slider-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-top:8px}
+.results-header{text-align:center;margin-bottom:36px}
+.results-header .step-tag{margin-bottom:14px}
+.hero-metric{text-align:center;padding:32px 24px;margin-bottom:28px;background:linear-gradient(135deg,var(--navy),var(--navy-mid));border-radius:var(--radius);position:relative;overflow:hidden}
+.hero-metric::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(59,130,246,.12),transparent 70%)}
+.hero-metric-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.45);margin-bottom:10px;position:relative}
+.hero-metric-value{font-family:var(--font-display);font-size:clamp(42px,8vw,56px);color:#fff;line-height:1;position:relative;letter-spacing:-1px}
+.hero-metric-sub{font-size:14px;color:rgba(255,255,255,.4);margin-top:8px;position:relative}
+.tier-badge{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:100px;font-size:13px;font-weight:600;margin-top:16px;position:relative}
+.tier-badge.high{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.tier-badge.strong{background:var(--accent-glow);color:var(--accent);border:1px solid rgba(59,130,246,.25)}
+.tier-badge.moderate{background:var(--yellow-bg);color:var(--yellow);border:1px solid var(--yellow-border)}
+.tier-dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
+.metric-card{padding:20px 18px;background:var(--surface-off);border:1px solid var(--border-light);border-radius:var(--radius-sm)}
+.metric-card-label{font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text-muted);margin-bottom:6px}
+.metric-card-value{font-family:var(--font-display);font-size:24px;color:var(--text-primary);letter-spacing:-.5px}
+.metric-card-desc{font-size:12.5px;color:var(--text-secondary);margin-top:4px;line-height:1.4}
+.metric-card.highlight{background:linear-gradient(135deg,rgba(16,185,129,.04),rgba(16,185,129,.02));border-color:var(--green-border)}
+.metric-card.highlight .metric-card-value{color:var(--green)}
+.court-prot{margin-bottom:24px;padding:20px 18px;background:linear-gradient(135deg,rgba(59,130,246,.04),rgba(129,140,248,.02));border:1px solid rgba(59,130,246,.15);border-radius:var(--radius-sm)}
+.court-prot .cp-title{font-size:18px;color:var(--accent);font-family:var(--font-display);margin-top:6px}
+.quote-block{padding:20px 24px;margin:24px 0;border-left:3px solid var(--accent);background:var(--surface-off);border-radius:0 var(--radius-sm) var(--radius-sm) 0}
+.quote-block p{font-family:var(--font-display);font-size:16px;font-style:italic;line-height:1.5;color:var(--text-secondary)}
+.quote-block cite{display:block;font-style:normal;font-family:var(--font-body);font-size:12.5px;color:var(--text-muted);margin-top:8px;font-weight:500}
+.proof-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:24px 0}
+.proof-item{text-align:center;padding:14px 8px}
+.proof-item-val{font-family:var(--font-display);font-size:20px;color:var(--text-primary)}
+.proof-item-label{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-top:2px}
+.cta-section{margin-top:28px}
+.btn-cta{width:100%;padding:16px 24px;background:linear-gradient(135deg,var(--accent),#4f7df5);color:#fff;border:none;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:15px;font-weight:600;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+.btn-cta:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(59,130,246,.3)}
+.btn-secondary{width:100%;padding:13px 24px;margin-top:10px;background:transparent;color:var(--text-secondary);border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;text-align:center;display:block;transition:all .2s}
+.btn-secondary:hover{border-color:var(--text-muted);color:var(--text-primary)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.animate-in{animation:fadeUp .45s ease both}
+.delay-1{animation-delay:.1s}.delay-2{animation-delay:.2s}.delay-3{animation-delay:.3s}.delay-4{animation-delay:.4s}.delay-5{animation-delay:.5s}
+@media(max-width:600px){
+.wrapper{padding:16px 12px 40px}
+.top-bar{margin-bottom:20px;gap:8px}
+.brand-text{font-size:12px;letter-spacing:.3px}
+.btn-top-demo{padding:8px 14px;font-size:12px}
+.step{padding:28px 20px 24px}
+.step-title{font-size:clamp(22px,5vw,28px);margin-bottom:10px}
+.step-sub{font-size:14px;margin-bottom:24px}
+.field input{padding:12px 14px;font-size:14px}
+.field label{font-size:11.5px}
+.q-title{font-size:19px;margin-bottom:20px}
+.options.cols-2,.options.cols-4{grid-template-columns:1fr 1fr}
+.options.cols-5{grid-template-columns:1fr 1fr}
+.opt-btn{padding:14px 12px;font-size:13.5px}
+.opt-btn .opt-label{font-size:14px}
+.opt-btn .opt-desc{font-size:11px}
+.slider-value{font-size:42px}
+.slider-unit{font-size:20px}
+.btn-primary{padding:14px 20px;font-size:14px}
+.nav-row{margin-top:20px}
+.metrics-grid{grid-template-columns:1fr;gap:10px}
+.metric-card{padding:16px 14px}
+.metric-card-value{font-size:22px}
+.hero-metric{padding:24px 16px;margin-bottom:20px}
+.hero-metric-value{font-size:clamp(36px,10vw,48px)}
+.quote-block{padding:16px 18px;margin:18px 0}
+.quote-block p{font-size:14.5px}
+.proof-strip{gap:4px;margin:18px 0}
+.proof-item{padding:10px 6px}
+.proof-item-val{font-size:17px}
+.proof-item-label{font-size:10px}
+.court-prot{padding:16px 14px}
+.cta-section{margin-top:20px}
+.btn-cta{padding:14px 20px;font-size:14px}
+.btn-secondary{padding:12px 20px;font-size:13px}
+.trust-line{font-size:11.5px;margin-top:12px}
+}
+@media(max-width:380px){
+.top-bar{flex-direction:column;gap:12px;align-items:stretch;text-align:center}
+.brand{justify-content:center}
+.btn-top-demo{justify-content:center}
+.options.cols-2,.options.cols-4,.options.cols-5{grid-template-columns:1fr}
+.step{padding:24px 16px 20px}
+.step-title{font-size:21px}
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+<div class="top-bar">
+<div class="brand"><div class="brand-mark">AP</div><div class="brand-text">Autopilot Pickleball</div></div>
+<a class="btn-top-demo" href="https://meetings-na2.hubspot.com/aziz-sorisho/book-a-call-with-autopilot-aziz-clone" target="_blank" rel="noopener">Book a Demo &rarr;</a>
+</div>
+<div class="card">
+<div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+<div class="steps">
+
+<div class="step active" data-step="0">
+<div class="step-tag">Live Calculator</div>
+<h1 class="step-title">How much is manual court cleaning <em>costing you?</em></h1>
+<p class="step-sub">Get your free ROI assessment in 60 seconds. See exactly what automation saves your facility.</p>
+<form id="leadForm" onsubmit="return false">
+<div class="field"><label>First Name</label><input type="text" id="fname" placeholder="Alex" required></div>
+<div class="field"><label>Email</label><input type="email" id="email" placeholder="alex@yourclub.com" required></div>
+<div class="field"><label>Club / Facility Name</label><input type="text" id="club" placeholder="Ace Pickleball Club"></div>
+<button class="btn-primary" type="button" onclick="startCalc()">Calculate My Savings <span class="arrow">&rarr;</span></button>
+</form>
+<div class="trust-line"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Join 5,000+ facilities. No spam, ever.</div>
+</div>
+
+<div class="step" data-step="1">
+<div class="q-label">Question 1 of 5</div>
+<h2 class="q-title">How many courts do you operate?</h2>
+<div class="options cols-5" data-q="courts">
+<button class="opt-btn" data-val="2"><span class="opt-label">1 - 3</span><span class="opt-desc">Starter</span></button>
+<button class="opt-btn" data-val="5"><span class="opt-label">4 - 6</span><span class="opt-desc">Small club</span></button>
+<button class="opt-btn" data-val="9"><span class="opt-label">7 - 10</span><span class="opt-desc">Mid-size</span></button>
+<button class="opt-btn" data-val="14"><span class="opt-label">11 - 16</span><span class="opt-desc">Large facility</span></button>
+<button class="opt-btn" data-val="22"><span class="opt-label">17+</span><span class="opt-desc">Multi-court</span></button>
+</div>
+<div class="nav-row"><button class="btn-back" type="button" onclick="goStep(0)">&larr; Back</button><button class="btn-primary" type="button" style="width:auto;padding:12px 28px" id="nextBtn1" disabled onclick="goStep(2)">Continue <span class="arrow">&rarr;</span></button></div>
+</div>
+
+<div class="step" data-step="2">
+<div class="q-label">Question 2 of 5</div>
+<h2 class="q-title">How are your courts cleaned today?</h2>
+<div class="options" data-q="method">
+<button class="opt-btn" data-val="owner">Owner or staff handles it</button>
+<button class="opt-btn" data-val="dedicated">Dedicated cleaning staff</button>
+<button class="opt-btn" data-val="outsourced">Outsourced cleaning service</button>
+</div>
+<div class="nav-row"><button class="btn-back" type="button" onclick="goStep(1)">&larr; Back</button><button class="btn-primary" type="button" style="width:auto;padding:12px 28px" id="nextBtn2" disabled onclick="goStep(3)">Continue <span class="arrow">&rarr;</span></button></div>
+</div>
+
+<div class="step" data-step="3">
+<div class="q-label">Question 3 of 5</div>
+<h2 class="q-title">Hours spent cleaning per day?</h2>
+<div class="slider-wrap">
+<div class="slider-value" id="hoursDisplay">1.5 <span class="slider-unit">hrs/day</span></div>
+<input type="range" id="hoursSlider" min="0.5" max="5" step="0.5" value="1.5" oninput="updateSlider(this)">
+<div class="slider-labels"><span>30 min</span><span>5+ hours</span></div>
+</div>
+<div class="nav-row"><button class="btn-back" type="button" onclick="goStep(2)">&larr; Back</button><button class="btn-primary" type="button" style="width:auto;padding:12px 28px" onclick="goStep(4)">Continue <span class="arrow">&rarr;</span></button></div>
+</div>
+
+<div class="step" data-step="4">
+<div class="q-label">Question 4 of 5</div>
+<h2 class="q-title">Approximate hourly cleaning cost?</h2>
+<div class="options cols-4" data-q="rate">
+<button class="opt-btn" data-val="13.5"><span class="opt-label">$12 - $15</span><span class="opt-desc">per hour</span></button>
+<button class="opt-btn" data-val="17.5"><span class="opt-label">$15 - $20</span><span class="opt-desc">per hour</span></button>
+<button class="opt-btn" data-val="25"><span class="opt-label">$20 - $30</span><span class="opt-desc">per hour</span></button>
+<button class="opt-btn" data-val="35"><span class="opt-label">$30+</span><span class="opt-desc">per hour</span></button>
+</div>
+<div class="nav-row"><button class="btn-back" type="button" onclick="goStep(3)">&larr; Back</button><button class="btn-primary" type="button" style="width:auto;padding:12px 28px" id="nextBtn4" disabled onclick="goStep(5)">Continue <span class="arrow">&rarr;</span></button></div>
+</div>
+
+<div class="step" data-step="5">
+<div class="q-label">Question 5 of 5</div>
+<h2 class="q-title">How often are courts cleaned?</h2>
+<div class="options cols-4" data-q="freq">
+<button class="opt-btn" data-val="365"><span class="opt-label">Daily</span></button>
+<button class="opt-btn" data-val="208"><span class="opt-label">Few times / week</span></button>
+<button class="opt-btn" data-val="52"><span class="opt-label">Weekly</span></button>
+<button class="opt-btn" data-val="156"><span class="opt-label">Inconsistent</span></button>
+</div>
+<div class="nav-row"><button class="btn-back" type="button" onclick="goStep(4)">&larr; Back</button><button class="btn-primary" type="button" style="width:auto;padding:12px 28px" id="nextBtn5" disabled onclick="showResults()">See My Results <span class="arrow">&rarr;</span></button></div>
+</div>
+
+<div class="step" data-step="6">
+<div class="results-header">
+<div class="step-tag">Your Results</div>
+<h2 class="step-title" style="font-size:clamp(22px,4vw,28px)">Here's what automation looks like for <em id="resultsClub">your club</em></h2>
+</div>
+<div class="hero-metric animate-in">
+<div class="hero-metric-label">Estimated Annual Savings</div>
+<div class="hero-metric-value" id="savingsVal">$0</div>
+<div class="hero-metric-sub">per year with CeCe automation</div>
+<div class="tier-badge" id="tierBadge"><span class="tier-dot"></span> <span id="tierText"></span></div>
+</div>
+<div class="metrics-grid">
+<div class="metric-card animate-in delay-1"><div class="metric-card-label">Current Annual Cost</div><div class="metric-card-value" id="currentCostVal">$0</div><div class="metric-card-desc">Manual cleaning spend</div></div>
+<div class="metric-card animate-in delay-2"><div class="metric-card-label">CeCe Annual Cost</div><div class="metric-card-value" id="ceceCostVal">$0</div><div class="metric-card-desc">$699/mo promotional rate</div></div>
+<div class="metric-card highlight animate-in delay-3"><div class="metric-card-label">Staff Hours Freed</div><div class="metric-card-value" id="hoursFreedVal">0</div><div class="metric-card-desc">Hours/year back to your team</div></div>
+<div class="metric-card highlight animate-in delay-4"><div class="metric-card-label">Payback Period</div><div class="metric-card-value" id="paybackVal">0</div><div class="metric-card-desc">Months until ROI positive</div></div>
+</div>
+<div class="court-prot animate-in delay-3"><div class="metric-card-label">Court Protection Bonus</div><div class="cp-title">Extends court life 1-2 years</div><div class="metric-card-desc">Consistent cleaning avoids $10K-$30K resurfacing costs per court. CeCe is HCA-certified and court-safe. No hard bristles, no damage.</div></div>
+<div class="quote-block animate-in delay-4"><p>"I've not seen another machine like this. This is going to be huge for the industry. Clubs can clean way more frequently, which will definitely extend court life."</p><cite>Nate, Midwest Pickleball Court Installer</cite></div>
+<div class="proof-strip animate-in delay-5">
+<div class="proof-item"><div class="proof-item-val">28,398</div><div class="proof-item-label">Spaces Cleaned</div></div>
+<div class="proof-item"><div class="proof-item-val">4,200+</div><div class="proof-item-label">Hours Operated</div></div>
+<div class="proof-item"><div class="proof-item-val">99%</div><div class="proof-item-label">Satisfaction</div></div>
+</div>
+<div class="cta-section animate-in delay-5">
+<a class="btn-cta" href="https://meetings-na2.hubspot.com/aziz-sorisho/book-a-call-with-autopilot-aziz-clone" target="_blank" rel="noopener">Book Your Free Demo <span class="arrow">&rarr;</span></a>
+<a class="btn-secondary" href="https://www.autopilotpickleball.com/stay-updated" target="_blank" rel="noopener">Download Court Cleaning Guide</a>
+</div>
+</div>
+
+</div></div></div>
+
+<script>
+var state={courts:0,method:'',hours:1.5,rate:0,freq:0};
+var currentStep=0;
+var totalSteps=6;
+
+document.querySelectorAll('.options').forEach(function(group){
+  var q=group.dataset.q;
+  group.querySelectorAll('.opt-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      group.querySelectorAll('.opt-btn').forEach(function(b){b.classList.remove('selected')});
+      btn.classList.add('selected');
+      var val=btn.dataset.val;
+      state[q]=isNaN(val)?val:parseFloat(val);
+      var stepEl=btn.closest('.step');
+      var nextBtn=stepEl.querySelector('.btn-primary');
+      if(nextBtn)nextBtn.disabled=false;
+    });
+  });
+});
+
+function updateSlider(el){
+  var val=parseFloat(el.value);
+  state.hours=val;
+  var display=document.getElementById('hoursDisplay');
+  display.textContent='';
+  display.appendChild(document.createTextNode(val+' '));
+  var unit=document.createElement('span');
+  unit.className='slider-unit';
+  unit.textContent='hrs/day';
+  display.appendChild(unit);
+  var pct=((val-0.5)/(5-0.5))*100;
+  el.style.setProperty('--fill',pct+'%');
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  var sl=document.getElementById('hoursSlider');
+  if(sl)updateSlider(sl);
+});
+
+function goStep(n){
+  document.querySelectorAll('.step').forEach(function(s){s.classList.remove('active');s.style.display='none'});
+  var target=document.querySelector('.step[data-step="'+n+'"]');
+  target.style.display='block';
+  target.classList.remove('active');
+  void target.offsetWidth;
+  target.classList.add('active');
+  currentStep=n;
+  updateProgress();
+}
+
+function updateProgress(){
+  var pct=currentStep===0?0:(currentStep/totalSteps)*100;
+  document.getElementById('progressFill').style.width=pct+'%';
+}
+
+function startCalc(){
+  var fname=document.getElementById('fname').value.trim();
+  var email=document.getElementById('email').value.trim();
+  if(!fname||!email)return;
+  state.fname=fname;
+  state.email=email;
+  state.club=document.getElementById('club').value.trim()||'your club';
+  goStep(1);
+}
+
+function showResults(){
+  var hours=state.hours;
+  var rate=state.rate;
+  var freq=state.freq;
+  var annualCleaningCost=Math.round(hours*rate*freq);
+  var ceceMonthlyCost=699;
+  var ceceAnnualCost=ceceMonthlyCost*12;
+  var savings=annualCleaningCost-ceceAnnualCost;
+  var hoursFreed=Math.round(hours*freq);
+  var paybackMonths=savings>0?Math.max(1,Math.round(ceceAnnualCost/(savings/12))):0;
+  var tier,tierText;
+  if(savings>5000){tier='high';tierText='High ROI \u2014 Strong Fit';}
+  else if(savings>2000){tier='strong';tierText='Strong ROI \u2014 Good Fit';}
+  else{tier='moderate';tierText='Moderate ROI';}
+  var displaySavings=Math.max(savings,0);
+  document.getElementById('resultsClub').textContent=state.club;
+  var badge=document.getElementById('tierBadge');
+  badge.className='tier-badge '+tier;
+  document.getElementById('tierText').textContent=tierText;
+  goStep(6);
+  animateValue('savingsVal',0,displaySavings,1200,'$','');
+  animateValue('currentCostVal',0,annualCleaningCost,900,'$','');
+  animateValue('ceceCostVal',0,ceceAnnualCost,900,'$','');
+  animateValue('hoursFreedVal',0,hoursFreed,1000,'',' hrs');
+  animateValue('paybackVal',0,savings>0?Math.min(paybackMonths,36):0,800,'',' mo');
+}
+
+function animateValue(id,start,end,duration,prefix,suffix){
+  var el=document.getElementById(id);
+  if(end===0){el.textContent=prefix+'0'+suffix;return;}
+  var range=end-start;
+  var startTime=performance.now();
+  function update(now){
+    var elapsed=now-startTime;
+    var progress=Math.min(elapsed/duration,1);
+    var eased=1-Math.pow(1-progress,3);
+    var current=Math.round(start+range*eased);
+    el.textContent=prefix+current.toLocaleString()+suffix;
+    if(progress<1)requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+</script>
+</body>
+</html>
