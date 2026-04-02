@@ -21,6 +21,30 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+// Save partial progress after each step
+app.post('/api/calculator/partial', async (req, res) => {
+  try {
+    const { email, step, data } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email required' });
+
+    const update = { updated_at: new Date().toISOString(), last_step: step };
+    Object.assign(update, data);
+
+    const { error } = await supabase
+      .from('calculator_leads')
+      .upsert({ email, ...update }, { onConflict: 'email' });
+
+    if (error) {
+      console.error('Partial save error:', error);
+      return res.status(500).json({ error: error.message });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Server error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Save calculator lead + results to Supabase
 app.post('/api/calculator', async (req, res) => {
   try {
