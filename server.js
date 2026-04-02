@@ -4,6 +4,16 @@ const path = require('path');
 
 const app = express();
 app.use(express.json());
+
+// 301 redirect root domain to calculator subdomain
+app.use((req, res, next) => {
+  const host = req.hostname;
+  if (host === 'getautopilotresources.com' || host === 'www.getautopilotresources.com') {
+    return res.redirect(301, 'https://calculator.getautopilotresources.com' + req.originalUrl);
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 const supabase = createClient(
